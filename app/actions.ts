@@ -121,7 +121,8 @@ export async function updateAdminProfile(formData: FormData) {
           token: process.env.BLOB_READ_WRITE_TOKEN,
         });
         imageUrl = blob.url;
-      } catch {
+      } catch (error) {
+        console.error("Admin profile Blob upload failed", error);
         redirect("/settings?error=blob-upload");
       }
     } else {
