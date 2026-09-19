@@ -4,7 +4,7 @@ import PageHead from '@/components/PageHead';
 import { updateAdminLogin, updateAdminProfile } from '@/app/actions';
 import { getAdminEmail } from '@/lib/auth';
 
-export default async function Settings({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+export default async function Settings({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
 	const sp = await searchParams;
 	const profile = (await db.prepare('SELECT * FROM admin_profile WHERE id=1').get()) as any;
 	const loginEmail = (await getAdminEmail());
@@ -12,6 +12,8 @@ export default async function Settings({ searchParams }: { searchParams: Promise
 	return <><PageHead title="Settings" subtitle="Manage the admin profile shown on your dashboard." />
 		<section className="card card-pad form-card"><h3 className="section-title">Admin Profile</h3>
 			{sp.saved && <div className="success" style={{ marginTop: 12 }}>Admin profile saved successfully.</div>}
+			{sp.error === 'blob-config' && <div className="error" style={{ marginTop: 12 }}>Image upload is not configured. Connect Vercel Blob and add BLOB_READ_WRITE_TOKEN, then try again.</div>}
+			{sp.error === 'blob-upload' && <div className="error" style={{ marginTop: 12 }}>Image upload failed. Check the Vercel Blob store configuration and try again.</div>}
 			<ActionForm action={updateAdminProfile} encType="multipart/form-data" style={{ marginTop: 16 }}><div className="form-grid">
 				<div className="field"><label htmlFor="name">Admin Name *</label><input className="input" id="name" name="name" defaultValue={profile?.name || ''} placeholder="e.g. Emon Ahmed" required /></div>
 				<div className="field"><label htmlFor="designation">Designation</label><input className="input" id="designation" name="designation" defaultValue={profile?.designation || ''} placeholder="e.g. Managing Director" /></div>

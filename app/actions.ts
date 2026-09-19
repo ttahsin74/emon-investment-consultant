@@ -1,4 +1,5 @@
 "use server";
+export const runtime = "nodejs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -111,15 +112,19 @@ export async function updateAdminProfile(formData: FormData) {
     const filename = `${randomUUID()}.${extension}`;
     const imageBuffer = Buffer.from(await image.arrayBuffer());
     if (process.env.VERCEL && !process.env.BLOB_READ_WRITE_TOKEN)
-      throw new Error("Configure BLOB_READ_WRITE_TOKEN in Vercel before uploading images.");
+      redirect("/settings?error=blob-config");
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blob = await put(`admin-profile/${filename}`, imageBuffer, {
-        access: "public",
-        addRandomSuffix: false,
-        contentType: image.type,
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-      });
-      imageUrl = blob.url;
+      try {
+        const blob = await put(`admin-profile/${filename}`, imageBuffer, {
+          access: "public",
+          addRandomSuffix: false,
+          contentType: image.type,
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+        imageUrl = blob.url;
+      } catch {
+        redirect("/settings?error=blob-upload");
+      }
     } else {
       const uploadDir = path.join(
         process.cwd(),
