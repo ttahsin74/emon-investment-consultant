@@ -1,0 +1,1 @@
+export default function StatusBadge({value}:{value:string}){const s=value.toLowerCase();const c=s.includes('won')||s.includes('convert')||s==='paid'||s==='completed'?'success':s.includes('lost')||s.includes('overdue')||s==='unpaid'?'danger':s.includes('interest')||s.includes('follow')||s==='partial'?'warn':'gray';return <span className={`badge ${c}`}>{value}</span>}

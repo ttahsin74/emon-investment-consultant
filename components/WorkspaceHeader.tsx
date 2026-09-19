@@ -1,0 +1,5 @@
+'use client';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Search, Plus, ChevronRight, Bell } from 'lucide-react';
+export default function WorkspaceHeader({name,unread=0}:{name:string;unread?:number}){const path=usePathname();const section=path.split('/')[1]||'dashboard';return <header className="topbar"><div className="breadcrumb"><span>Workspace</span><ChevronRight size={14}/><strong>{section==='followups'?'Follow-ups':section[0].toUpperCase()+section.slice(1)}</strong></div><form action="/clients" className="header-search"><Search size={16}/><input name="q" aria-label="Search all clients" placeholder="Search clients, phone, location..."/><kbd>Search</kbd></form><div className="rig"><Link href="/notifications" className="btn btn-sm" aria-label={`${unread} unread notifications`}><Bell size={16}/>{unread>0&&<span>{unread}</span>}</Link><Link href="/clients/new" className="btn btn-primary btn-sm"><Plus size={16}/><span>New client</span></Link><Link href="/settings" className="user-avatar" aria-label={'Profile: '+name}>{name.slice(0,1).toUpperCase()}</Link></div></header>}

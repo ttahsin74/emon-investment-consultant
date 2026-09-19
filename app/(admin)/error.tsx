@@ -1,0 +1,3 @@
+'use client';
+import Link from 'next/link';
+export default function ErrorPage({reset}:{reset:()=>void}){return <section className="card empty-state"><h2>We could not load this page</h2><p className="muted">Please try again. Your saved records are still available.</p><div className="actions"><button className="btn btn-primary" onClick={reset}>Try again</button><Link href="/dashboard" className="btn">Back to dashboard</Link></div></section>}

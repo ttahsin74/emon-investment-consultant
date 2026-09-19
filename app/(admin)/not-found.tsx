@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound(){return <section className="card empty-state"><span className="eyebrow">RECORD NOT FOUND</span><h2>This record is no longer available</h2><p className="muted">It may have been deleted, or the link may be incorrect.</p><Link className="btn btn-primary" href="/clients">Browse clients</Link></section>}

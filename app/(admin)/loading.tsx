@@ -1,0 +1,1 @@
+export default function Loading(){return <div role="status" aria-label="Loading workspace"><div className="skeleton" style={{height:70,marginBottom:24}}/><div className="kpis">{[1,2,3,4].map(n=><div key={n} className="skeleton" style={{height:130}}/>)}</div><div className="skeleton" style={{height:320}}/><span className="muted">Loading your workspace...</span></div>}

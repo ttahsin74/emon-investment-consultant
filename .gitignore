@@ -1,0 +1,12 @@
+node_modules
+.next
+.env.local
+data/*.db
+data/*.db-shm
+data/*.db-wal
+.DS_Store
+
+.next-check/
+.next-smoke/
+.next-turso/
+*.zip
