@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { put } from "@vercel/blob";
 import db from "@/lib/db";
 import { closedLeadStatus, readFollowup } from "@/lib/followups";
 import { expectedAuthToken, getAdminEmail, isAuthenticated, updateAdminCredentials, verifyAdminCredentials } from "@/lib/auth";
@@ -107,19 +108,29 @@ export async function updateAdminProfile(formData: FormData) {
     if (image.size > 5 * 1024 * 1024)
       throw new Error("Image must be smaller than 5MB");
     const extension = imageTypes[image.type];
-    const uploadDir = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "admin-profile",
-    );
-    await mkdir(uploadDir, { recursive: true });
     const filename = `${randomUUID()}.${extension}`;
-    await writeFile(
-      path.join(uploadDir, filename),
-      Buffer.from(await image.arrayBuffer()),
-    );
-    imageUrl = `/uploads/admin-profile/${filename}`;
+    const imageBuffer = Buffer.from(await image.arrayBuffer());
+    if (process.env.VERCEL && !process.env.BLOB_READ_WRITE_TOKEN)
+      throw new Error("Configure BLOB_READ_WRITE_TOKEN in Vercel before uploading images.");
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(`admin-profile/${filename}`, imageBuffer, {
+        access: "public",
+        addRandomSuffix: false,
+        contentType: image.type,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+      imageUrl = blob.url;
+    } else {
+      const uploadDir = path.join(
+        process.cwd(),
+        "public",
+        "uploads",
+        "admin-profile",
+      );
+      await mkdir(uploadDir, { recursive: true });
+      await writeFile(path.join(uploadDir, filename), imageBuffer);
+      imageUrl = `/uploads/admin-profile/${filename}`;
+    }
   }
 
   (await db.prepare(
